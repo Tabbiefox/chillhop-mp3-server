@@ -61,17 +61,17 @@ export function initServer(config: IConfig): express.Express {
 }
 
 export function initServerRoutes(server: express.Express): void {
-    server.use('/radio/api', ApiRouter);
+    server.use('/api', ApiRouter);
 }
 
 export function initServerErrorHandler(server: express.Express): void {
     server.use((err, req, res, next) => {
         if (err instanceof HTTPErrors.HttpError) {
             const error = {
-                status: err.status || 500,
+                code: err.status || 500,
                 message: err.message || 'Unknown error occured'
             }
-            res.status(error.status).send({ error });
+            res.status(error.code).send({ error });
         }
     });
 }
