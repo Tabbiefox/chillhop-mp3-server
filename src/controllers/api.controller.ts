@@ -4,6 +4,27 @@ import { getProviders, getServices } from '../app';
 import { isObject, isEmpty } from '../helpers';
 import { PlaylistTrack, Playlist, Track } from '../models';
 
+/**
+ * @api {get} /radios Request list of available radios
+ * @apiName GetRadios
+ * 
+ * @apiSuccess {Object[]}   _root               List of radios.
+ * @apiSuccess {Number}     _root.playlist_id   Playlist ID
+ * @apiSuccess {String}     _root.name          Radio title
+ * 
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      [
+ *          {
+ *              "playlist_id": 1,
+ *              "name": "Radio Playlist 1"
+ *          },
+ *          {
+ *              "playlist_id": 2,
+ *              "name": "Radio Playlist 2"
+ *          }
+ *      ]
+ */
 export function getRadios(req: Request, res: Response, next: NextFunction) {
     const result = getServices().radio.getRadios();
     res.json(result.map((x) => ({
@@ -12,6 +33,40 @@ export function getRadios(req: Request, res: Response, next: NextFunction) {
     })));
 }
 
+/**
+ * @api {get} /playlist/:id Request playlist of a specific radio
+ * @apiName GetPlaylist
+ * @apiParam {Number}   id    Playlist ID
+ * 
+ * @apiSuccess {Object[]}   _root               List of playlist tracks.
+ * @apiSuccess {String}     _root.artists       Artist name
+ * @apiSuccess {String}     _root.title         Track title
+ * @apiSuccess {String}     _root.featured      Name of featured artist
+ * @apiSuccess {Number}     _root.likes         Number of likes
+ * @apiSuccess {Number}     _root.startTime     Playing start timestamp
+ * @apiSuccess {Number}     _root.endTime       Playing end timestamp
+ * @apiSuccess {Number}     _root.duration      Track duration timestamp
+ * @apiSuccess {Number}     _root.track_id      Track ID
+ * @apiSuccess {Number}     _root.fileID        File ID
+ * @apiSuccess {String}     _root.img           URL of track image
+ * 
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      [
+ *          {
+ *              "artists": "Artist 1",
+ *              "title": "Track 1",
+ *              "featured": "Artist 2",
+ *              "likes": 100,
+ *              "startTime": 1585842247,
+ *              "date_to": 1585842374,
+ *              "duration": 126315,
+ *              "track_id": 1199,
+ *              "fileID": 1199,
+ *              "img": "https://cms.chillhop.com/?serve&file=1199"
+ *          }
+ *      ]
+ */
 export function getPlaylist(req: Request, res: Response, next: NextFunction) {
     const id = Number(req.params.id);
     if (!id) {
@@ -39,6 +94,27 @@ export function getPlaylist(req: Request, res: Response, next: NextFunction) {
     }));
 }
 
+/**
+ * @api {get} /current_track/:id Request currently playing track of a specific radio
+ * @apiName GetCurrentTrack
+ * @apiParam {Number}   id    Playlist ID
+ * 
+ * @apiSuccess {String}     artists     Artist name
+ * @apiSuccess {String}     title       Track title
+ * @apiSuccess {Number}     start_at    Playing start timestamp
+ * @apiSuccess {Number}     track_id    Track ID
+ * @apiSuccess {String}     img         URL of track image
+ * 
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "artists": "Artist 1",
+ *          "title": "Track 1",
+ *          "start_at": 1585842247,
+ *          "track_id": 1199,
+ *          "img": "https://cms.chillhop.com/?serve&file=1199"
+ *      }
+ */
 export function getCurrentTrack(req: Request, res: Response, next: NextFunction) {
     const id = Number(req.params.id);
     if (!id) {
@@ -64,6 +140,17 @@ export function getCurrentTrack(req: Request, res: Response, next: NextFunction)
     });
 }
 
+/**
+ * @api {get} /current_track_text/:id Request currently playing track text of a specific radio
+ * @apiName GetCurrentTrackText
+ * @apiParam {Number}   id    Playlist ID
+ * 
+ * @apiSuccess 200 Track text
+ * 
+ * @apiSuccessExample {text/plain} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      Artist 1 - Track 1
+ */
 export function getCurrentTrackText(req: Request, res: Response, next: NextFunction) {
     const id = Number(req.params.id);
     if (!id) {
@@ -79,6 +166,38 @@ export function getCurrentTrackText(req: Request, res: Response, next: NextFunct
     res.type('text/plain').send(track.getTrackName());
 }
 
+/**
+ * @api {post} /update_playlist Create or update a radio playlist
+ * @apiName PostUpdatePlaylist
+ * 
+ * @apiParam {Number}   playlist_id     Playlist ID
+ * @apiParam {String}   title           Playlist title
+ * @apiParam {Date}     date            Playlist date
+ * @apiParam {Object[]} tracks          List of playlist tracks
+ * @apiParam {Number}   tracks.trackid  Track ID
+ * @apiParam {Number}   tracks.pos      Track position
+ * 
+ * @apiParamExample {json} Request-Example:
+ *      {
+ *          "playlist_id": 1,
+ *          "title": "Playlist 1",
+ *          "date": 1585842247,
+ *          "tracks": [
+ *              {
+ *                  "trackid": 1,
+ *                  "pos": 1
+ *              }
+ *          ]
+ *      }
+ * 
+ * @apiSuccess {Boolean}    success     Success boolean
+ * 
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "success": true,
+ *      }
+ */
 export async function postUpdatePlaylist(req: Request, res: Response, next: NextFunction) {
     const data = req.body;
     if (!data || !isObject(data) || isEmpty(data)) {
@@ -192,6 +311,41 @@ export async function postUpdatePlaylist(req: Request, res: Response, next: Next
 
 
 /**
+ * @api {post} /track Upload new track to the server
+ * @apiName PostTrack
+ * @apiDescription Api end-point for new track uploads.
+ *                 File contents are to be Base64 encrypted.
+ *                 Missing optional meta parameters will retrieved from ID3.
+ * 
+ * @apiParam {Number}   id              Track ID
+ * @apiParam {Number}   [file_id]       (Optional) File ID
+ * @apiParam {String}   [artist]        (Optional) Artist name
+ * @apiParam {String}   [title]         (Optional) Track title
+ * @apiParam {String}   [featured]      (Optional) Featured artist name
+ * @apiParam {String}   [img]           (Optional) URL of track image
+ * @apiParam {Number}   [duration]      (Optional) Track position
+ * @apiParam {String}   file_contents   Base64 encoded file contents (max. 50mb)
+ * 
+ * @apiParamExample {json} Request-Example:
+ *      {
+ *          "id": 1,
+ *          "file_id": 1,
+ *          "artist": "Artist 1",
+ *          "title": "Title 1",
+ *          "featured": "Artist 2",
+ *          "img": "https://cms.chillhop.com/?serve&file=1199",
+ *          "duration": 192000,
+ *          "file_contents": "SGVsbG8gd29ybGQ="
+ *      }
+ * 
+ * @apiSuccess {Boolean}    success     Success boolean
+ * 
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "success": true,
+ *      }
+ * 
  * @todo: Parse missing img from ID3 (id3.common.picture[0].data: Buffer)
  */
 export async function postTrack(req: Request, res: Response, next: NextFunction) {
