@@ -51,6 +51,16 @@ export class RadioProvider {
         return radio;
     }
 
+    public async deleteRadio(id: number) {
+        const dbc = await this.db.getConnection();
+        await dbc
+            .table('chill_playlist_radios')
+            .del()
+            .where({
+                playlist_id: id
+            });
+    }
+
     public async getRadioTracks(id: number): Promise<RadioTrack[]> {
         const dbc = await this.db.getConnection();
         const result = await dbc

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import * as ApiController from '../controllers/api.controller';
 
 /**
- * Definition of exposed API routes
+ * Registration of API routes
  */
 const ApiRouter = Router();
 ApiRouter.get('/radios', async (req, res, next) => await ApiController.getRadios(req, res, next));

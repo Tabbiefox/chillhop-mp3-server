@@ -1,11 +1,11 @@
 /**
- * Consume environment variables and expose them in `process.env`
+ * Consume .env variables and expose them in `process.env`
  */
 import dotenv from 'dotenv';
 dotenv.config();
 
 /**
- * Load configuration JSONs from ./config and export for global use
+ * Load configuration JSONs from ./config and export them for global use
  */
 export { 
     config, 

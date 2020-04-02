@@ -1,29 +1,25 @@
-/**
- * Import app configuration
- */
 import { config } from './config';
-
-/**
- * Import app initialization components
- */
 import * as App from './app';
-import { Playlist } from './models';
 
 /**
- * Application bootstrap
+ * Asynchronous application bootstrap
  */
 export async function init() {
     try {
+        // Instantiate and register app services
         App.initServices(config);
 
+        // Instantiate and configure web server
         const server = App.initServer(config);
         App.initServerRoutes(server);
         App.initServerErrorHandler(server);
-        App.initScheduledTasks();
 
-        // Start radio server
+        // Start radio server service
         const radioServer = App.getServices().radio;
-        radioServer.getRadioChange().subscribe((radio) => {
+        radioServer.start();
+
+        // Hook a subscriber to the track change observable
+        radioServer.getTrackChange().subscribe((radio) => {
             let currentTime = new Date();
             let currentTrack = radio.getCurrentTrack();
             let duration = new Date(currentTrack.duration);
@@ -32,8 +28,7 @@ export async function init() {
                 'New track playing on ' + radio.name + ': ' +
                 currentTrack.getTrackName() + 
                 ' [' + duration.toTimeString().substr(3, 5) + ']');
-        })
-        radioServer.start();
+        });
 
         // Start web server
         server.listen(Number(config.port) || 8080);
