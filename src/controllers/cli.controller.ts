@@ -1,0 +1,2 @@
+import { getProviders } from '../app';
+

@@ -1,0 +1,27 @@
+# Distribution folder
+dist
+
+# Environment configuration and app config
+.env
+config/env/*.json
+config/*.d.ts
+
+# Dependency directory
+# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
+node_modules
+
+# Logs
+logs
+*.log
+.DS_Store
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# File repository
+files/*
+
+# Except .gitkeep
+!.gitkeep

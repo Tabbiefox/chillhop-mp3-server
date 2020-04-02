@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "dist",
+    "target": "es2017",
+    "module": "commonjs",
+    "sourceMap": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "paths": {
+      //"src/*": [ "src/*" ],
+    }
+  },
+  "include": [
+    "src/**/**.ts",
+    "test/**/**.ts",
+    "config/"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

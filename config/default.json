@@ -1,0 +1,21 @@
+{
+    "port": 8080,
+    "conf": "default",
+    "database": {
+        "client": "mysql2",
+        "host": "127.0.0.1",
+        "port": 3306,
+        "user": "root",
+        "password": "",
+        "database": "chillhop-mp3-server",
+        "debug": true
+    },
+    "radio": {
+        "playlistLength": 10,
+        "minShuffleTimeout": 3600000,
+        "poolingInterval": 1000
+    },
+    "storage": {
+        "rootDir": "./files/"
+    }
+}
