@@ -1,7 +1,7 @@
 export function isObject(v: any): boolean {
-    return v.constructor === Object;
+    return Object.prototype.toString.call(v) === '[object Object]';
 }
 
-export function isEmpty(v: Object | Array<any>): boolean {
+export function isEmpty(v: object | any[]): boolean {
     return !Object.keys(v).length;
 }

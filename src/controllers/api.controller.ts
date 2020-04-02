@@ -19,7 +19,7 @@ export function getPlaylist(req: Request, res: Response, next: NextFunction) {
     }
 
     const radio = getServices().radio.getRadio(id);
-    if (!radio || radio.playlistId != id) {
+    if (!radio || radio.playlistId !== id) {
         return next(createError(404, 'Radio id ' + id + ' does not exist'));
     }
 
@@ -46,7 +46,7 @@ export function getCurrentTrack(req: Request, res: Response, next: NextFunction)
     }
 
     const radio = getServices().radio.getRadio(id);
-    if (!radio || radio.playlistId != id) {
+    if (!radio || radio.playlistId !== id) {
         return next(createError(404, 'Radio id ' + id + ' does not exist'));
     }
 
@@ -71,7 +71,7 @@ export function getCurrentTrackText(req: Request, res: Response, next: NextFunct
     }
 
     const radio = getServices().radio.getRadio(id);
-    if (!radio || radio.playlistId != id) {
+    if (!radio || radio.playlistId !== id) {
         return next(createError(404, 'Radio id ' + id + ' does not exist'));
     }
 
@@ -114,7 +114,7 @@ export async function postUpdatePlaylist(req: Request, res: Response, next: Next
     playlist.date = date;
 
     // Validate params for PlaylistTrack object
-    let tracks: Array<any> = ('tracks' in data) ? data.tracks : null;
+    let tracks: any[] = ('tracks' in data) ? data.tracks : null;
     if (!tracks) {
         return next(createError(422, 'No track array specified'));
     }
@@ -158,9 +158,9 @@ export async function postUpdatePlaylist(req: Request, res: Response, next: Next
     const db = getProviders().playlist;
 
     // Update existing playlist
-    if ((await db.getPlaylist(playlistId)).id == playlistId) {
+    if ((await db.getPlaylist(playlistId)).id === playlistId) {
         await db.updatePlaylist(playlist);
-        await saveTracks(playlist);
+        await saveTracks(playlist.tracks);
 
         // Update radio in the radio service
         await getServices().radio.updateRadio(playlist);
@@ -168,17 +168,17 @@ export async function postUpdatePlaylist(req: Request, res: Response, next: Next
     // Insert new playlist
     else {
         await db.insertPlaylist(playlist);
-        await saveTracks(playlist);
+        await saveTracks(playlist.tracks);
 
         // Create new radio and register in the radio service
         await getServices().radio.createRadio(playlist);
     }
 
     // Save new tracks to playlist
-    async function saveTracks(playlist) {
-        return await Promise.all(playlist.tracks.map(async (track) => {
+    async function saveTracks(playlistTracks: PlaylistTrack[]) {
+        return await Promise.all(playlistTracks.map(async (track) => {
             return db.getPlaylistTrack(track.playlistId, track.id).then((result) => {
-                if (result.playlistId != track.playlistId) {
+                if (result.playlistId !== track.playlistId) {
                     return db.insertPlaylistTrack(track);
                 }
             });

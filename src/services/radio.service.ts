@@ -34,7 +34,7 @@ export class RadioService {
     }
     
     public getRadio(id: number): Radio {
-        return this.radios.find((x) => x.playlistId == id);
+        return this.radios.find((x) => x.playlistId === id);
     }
 
     public getRadios(): Radio[] {
@@ -113,7 +113,7 @@ export class RadioService {
             );
 
             newTracks.map((track) => {
-                if (!radio.tracks.find((x) => { x.id == track.id }))
+                if (!radio.tracks.find(x => x.id === track.id))
                 {
                     let radioTrack = new RadioTrack();
                     radioTrack.startTime = lastTime;
@@ -129,7 +129,7 @@ export class RadioService {
 
         // If the current track changed, report to the trackChangeSubject
         if (radio.getCurrentTrack()) {
-            if (!currentTrack || currentTrack.id != radio.getCurrentTrack().id) {
+            if (!currentTrack || currentTrack.id !== radio.getCurrentTrack().id) {
                 this.radioChangeSubject.next(radio);
                 return true;
             }

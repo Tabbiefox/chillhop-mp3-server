@@ -71,7 +71,7 @@ export function initServerErrorHandler(server: express.Express): void {
                 status: err.status || 500,
                 message: err.message || 'Unknown error occured'
             }
-            res.status(error.status).send({ error: error });
+            res.status(error.status).send({ error });
         }
     });
 }

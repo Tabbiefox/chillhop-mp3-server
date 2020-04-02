@@ -22,8 +22,8 @@ export async function init() {
         App.initScheduledTasks();
 
         // Start radio server
-        const radio = App.getServices().radio;
-        radio.getRadioChange().subscribe((radio) => {
+        const radioServer = App.getServices().radio;
+        radioServer.getRadioChange().subscribe((radio) => {
             let currentTime = new Date();
             let currentTrack = radio.getCurrentTrack();
             let duration = new Date(currentTrack.duration);
@@ -33,7 +33,7 @@ export async function init() {
                 currentTrack.getTrackName() + 
                 ' [' + duration.toTimeString().substr(3, 5) + ']');
         })
-        radio.start();
+        radioServer.start();
 
         // Start web server
         server.listen(Number(config.port) || 8080);

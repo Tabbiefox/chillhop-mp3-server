@@ -52,7 +52,7 @@ export class PlaylistProvider {
         await dbc
             .table('chill_playlists')
             .del()
-            .where({ id: id });
+            .where({ id });
     }
 
     public async getPlaylistTrack(playlistId: number, trackId: number): Promise<PlaylistTrack> {
