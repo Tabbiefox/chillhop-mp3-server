@@ -128,7 +128,7 @@ export class RadioService {
         if (!this.getRadio(id))
             return;
 
-        this.radios = this.radios.filter(x => x.playlistId != id);
+        this.radios = this.radios.filter(x => x.playlistId !== id);
         await getProviders().radio.deleteRadio(id);
     }
 

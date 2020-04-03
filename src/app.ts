@@ -85,7 +85,7 @@ export function initServerRoutes(server: express.Express): void {
     server.use('/api', ApiRouter);
 
     // Register route fallback for every other request
-    server.use(function (req, res, next) {
+    server.use((req, res, next) => {
         return next(createHttpError(404, 'Resource not found'));
     });
 }
