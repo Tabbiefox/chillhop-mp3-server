@@ -68,16 +68,22 @@ export function getRadios(req: Request, res: Response, next: NextFunction) {
  *      ]
  */
 export function getPlaylist(req: Request, res: Response, next: NextFunction) {
+    // Validate params
+    if (!req.params.id) {
+        return next(createError(400, 'No radio ID Specified'));
+    }
     const id = Number(req.params.id);
-    if (!id) {
-        return next(createError(400, 'Id is not a number'));
+    if (isNaN(id)) {
+        return next(createError(400, 'Invalid radio ID specified'));
     }
 
+    // Load required radio
     const radio = getServices().radio.getRadio(id);
     if (!radio || radio.playlistId !== id) {
-        return next(createError(404, 'Radio id ' + id + ' does not exist'));
+        return next(createError(404, 'Radio ID ' + id + ' does not exist'));
     }
 
+    // Return list of radio tracks
     res.json(radio.tracks.map((x) => { 
         return {
             artists: x.artist || 'Unknown artist',
@@ -116,21 +122,26 @@ export function getPlaylist(req: Request, res: Response, next: NextFunction) {
  *      }
  */
 export function getCurrentTrack(req: Request, res: Response, next: NextFunction) {
+    // Validate params    
+    if (!req.params.id) {
+        return next(createError(400, 'No radio ID Specified'));
+    }
     const id = Number(req.params.id);
-    if (!id) {
-        return next(createError(400, 'Id is not a number'));
+    if (isNaN(id)) {
+        return next(createError(400, 'Invalid radio ID specified'));
     }
 
+    // Load required radio and its current track
     const radio = getServices().radio.getRadio(id);
     if (!radio || radio.playlistId !== id) {
-        return next(createError(404, 'Radio id ' + id + ' does not exist'));
+        return next(createError(404, 'Radio ID ' + id + ' does not exist'));
     }
-
     const track = radio.getCurrentTrack();
     if (!track) {
         return next(createError(404, 'Radio id ' + id + ' is not playing any track'));
     }
 
+    // Return json
     res.json({ 
         artists: track.artist,
         title: track.title,
@@ -152,17 +163,26 @@ export function getCurrentTrack(req: Request, res: Response, next: NextFunction)
  *      Artist 1 - Track 1
  */
 export function getCurrentTrackText(req: Request, res: Response, next: NextFunction) {
+    // Validate params
+    if (!req.params.id) {
+        return next(createError(400, 'No radio ID Specified'));
+    }
     const id = Number(req.params.id);
-    if (!id) {
-        return next(createError(400, 'Id is not a number'));
+    if (isNaN(id)) {
+        return next(createError(400, 'Invalid radio ID specified'));
     }
 
+    // Load required radio and its current track
     const radio = getServices().radio.getRadio(id);
     if (!radio || radio.playlistId !== id) {
         return next(createError(404, 'Radio id ' + id + ' does not exist'));
     }
-
     const track = radio.getCurrentTrack();
+    if (!track) {
+        return next(createError(404, 'Radio id ' + id + ' is not playing any track'));
+    }
+
+    // Return track name in plan text
     res.type('text/plain').send(track.getTrackName());
 }
 
@@ -199,12 +219,13 @@ export function getCurrentTrackText(req: Request, res: Response, next: NextFunct
  *      }
  */
 export async function postUpdatePlaylist(req: Request, res: Response, next: NextFunction) {
+    // Ensure POST data exists
     const data = req.body;
     if (!data || !isObject(data) || isEmpty(data)) {
         return next(createError(400, 'No POST data found'));
     }
 
-    // Validate params for Playlist object
+    // Validate playlist params
     let playlistId: number = ('playlist_id' in data) ? Number(data.playlist_id) : null;
     if (!playlistId) {
         return next(createError(422, 'No playlist ID specified'));
@@ -232,7 +253,7 @@ export async function postUpdatePlaylist(req: Request, res: Response, next: Next
     playlist.name = title;
     playlist.date = date;
 
-    // Validate params for PlaylistTrack object
+    // Validate playlist tracks param
     let tracks: any[] = ('tracks' in data) ? data.tracks : null;
     if (!tracks) {
         return next(createError(422, 'No track array specified'));
@@ -244,7 +265,7 @@ export async function postUpdatePlaylist(req: Request, res: Response, next: Next
         return next(createError(422, 'The track array is empty'));
     }
 
-    // Insert PlaylistTrack objects into playlist instance
+    // Validate each playlist track param and create playlistTrack instances
     try {
         playlist.tracks = tracks.map<PlaylistTrack>((x, i) => { 
             if (!x || !isObject(x) || isEmpty(x)) {
@@ -349,22 +370,19 @@ export async function postUpdatePlaylist(req: Request, res: Response, next: Next
  * @todo: Parse missing img from ID3 (id3.common.picture[0].data: Buffer)
  */
 export async function postTrack(req: Request, res: Response, next: NextFunction) {
+    // Ensure POST data exists
     const data = req.body;
     if (!data || !isObject(data) || isEmpty(data)) {
         return next(createError(400, 'No POST data found'));
     }
 
-    /**
-     * Validate file contents and create buffer
-     */
+    // Validate file contents param and create file Buffer
     let fileContents: Buffer = ('file_contents' in data) ? Buffer.from(data.file_contents, 'base64') : null;
     if (!fileContents) {
         return next(createError(422, 'No file contents specified'));
     }
 
-    /**
-     * Validate params for Track object
-     */
+    // Validate track params
     let id: number = ('id' in data) ? Number(data.id) : null;
     if (!id) {
         return next(createError(422, 'No track ID specified'));
@@ -382,9 +400,7 @@ export async function postTrack(req: Request, res: Response, next: NextFunction)
     let img: string = ('img' in data) ? String(data.img) : null;
     let duration: number = ('duration' in data) ? Number(data.duration) : null;
 
-    /**
-     * Attempt to fill missing file info from ID3
-     */
+    // Attempt to retrieve missing file metadata from ID3
     const id3 = await getServices().storage.getID3(fileContents);
     artist = artist || ('artist' in id3.common) ? id3.common.artist : null;
     if (!artist) {
@@ -399,9 +415,7 @@ export async function postTrack(req: Request, res: Response, next: NextFunction)
         return next(createError(422, 'Unable to determine track duration'));
     }
 
-    /**
-     * Store track info to DB
-     */
+    // Create track instance and store it into DB
     let track = new Track();
     track.id = id;
     track.fileId = fileId;
@@ -416,11 +430,9 @@ export async function postTrack(req: Request, res: Response, next: NextFunction)
         return next(createError(500, 'Error occured while saving track info to database'));
     };
 
-    /**
-     * Store file contents
-     */
+    // Store file contents
     const storage = getServices().storage;
-    const fileName = fileId + '.mp3';
+    const fileName = track.getFileName();
     try {
         await storage.saveFile(fileName, fileContents);
     } catch(error) {

@@ -2,13 +2,30 @@ import { DatabaseService } from '../services/database.service';
 import { Radio, RadioTrack } from '../models';
 import { TrackProvider } from './track.provider';
 
+/**
+ * Radio data provider
+ */
 export class RadioProvider {
+    /**
+     * Database connection link
+     */
     private db: DatabaseService;
 
+    /**
+     * Create radio data provider instance and save database connection link
+     * 
+     * @param db Database connection link
+     */
     constructor(db: DatabaseService) {
         this.db = db;
     }
 
+    /**
+     * Load radio data by specific id
+     * 
+     * @param id Radio id
+     * @returns Radio object
+     */
     public async getRadio(id: number): Promise<Radio> {
         const dbc = await this.db.getConnection();
         const result = await dbc
@@ -20,6 +37,11 @@ export class RadioProvider {
         return RadioProvider.radioTransformer(result, new Radio());
     }
 
+    /**
+     * Load a list of radios
+     * 
+     * @returns List of radio objects
+     */
     public async getAllRadios(): Promise<Radio[]> {
         const dbc = await this.db.getConnection();
         const result = await dbc
@@ -29,6 +51,12 @@ export class RadioProvider {
         return result.map((r) => RadioProvider.radioTransformer(r, new Radio()));
     }
 
+    /**
+     * Store a new radio and return updated radio object with newly assigned id
+     * 
+     * @param playlist Radio object
+     * @returns Updated radio object
+     */
     public async insertRadio(radio: Radio): Promise<Radio> {
         const dbc = await this.db.getConnection();
         await dbc
@@ -41,6 +69,12 @@ export class RadioProvider {
         return radio;
     }
 
+    /**
+     * Update an existing radio
+     * 
+     * @param playlist Radio object
+     * @returns Radio object
+     */
     public async updateRadio(radio: Radio): Promise<Radio> {
         const dbc = await this.db.getConnection();
         await dbc
@@ -51,6 +85,11 @@ export class RadioProvider {
         return radio;
     }
 
+    /**
+     * Delete an existing radio
+     * 
+     * @param id Radio id
+     */    
     public async deleteRadio(id: number) {
         const dbc = await this.db.getConnection();
         await dbc
@@ -61,18 +100,30 @@ export class RadioProvider {
             });
     }
 
-    public async getRadioTracks(id: number): Promise<RadioTrack[]> {
+    /**
+     * Load all radio tracks by specific radio id
+     * 
+     * @param radioId Radio id
+     * @returns List of radioTrack objects
+     */
+    public async getRadioTracks(radioId: number): Promise<RadioTrack[]> {
         const dbc = await this.db.getConnection();
         const result = await dbc
             .select()
             .from('chill_radio_tracks')
             .join('chill_tracks', 'track_id', 'id')
-            .where({ playlist_id: id })
+            .where({ playlist_id: radioId })
             .orderBy('start_time', 'asc');
 
         return result.map((r) => RadioProvider.radioTrackTransformer(r, new RadioTrack()));
     }
 
+    /**
+     * Store a new radio track and return radioTrack object
+     * 
+     * @param radioTrack RadioTrack object
+     * @returns RadioTrack object
+     */
     public async insertRadioTrack(radioTrack: RadioTrack): Promise<RadioTrack> {
         const dbc = await this.db.getConnection();
         await dbc
@@ -87,23 +138,30 @@ export class RadioProvider {
         return radioTrack;
     }
 
-    public async deleteRadioTrack(playlistId: number, trackId: number) {
+    /**
+     * Delete an existing radio track
+     * 
+     * @param radioId Radio id
+     * @param trackId Track id
+     */
+    public async deleteRadioTrack(radioId: number, trackId: number) {
         const dbc = await this.db.getConnection();
         await dbc
             .table('chill_radio_tracks')
             .del()
             .where({
-                playlist_id: playlistId,
+                playlist_id: radioId,
                 track_id: trackId
             });
     }
     
     /**
-     * Static method that transforms database row data to Radio object
+     * Cast database row data to Radio instance
      * 
      * @static
-     * @param row Source data
-     * @param obj Destination object of type Radio
+     * @param row Database row data
+     * @param obj Radio instance
+     * @returns Updated radio instance
      */
     public static radioTransformer<T extends Radio>(row: any, obj: T): T {
         if (row) {
@@ -114,11 +172,12 @@ export class RadioProvider {
     }
 
     /**
-     * Static method that transforms database row data to RadioTrack object
+     * Cast database row data to RadioTrack instance
      * 
      * @static
-     * @param row Source data
-     * @param obj Destination object of type RadioTrack
+     * @param row Database row data
+     * @param obj RadioTrack instance
+     * @returns RadioTrack instance
      */
     public static radioTrackTransformer<T extends RadioTrack>(row: any, obj: T): T {
         if (row) {
