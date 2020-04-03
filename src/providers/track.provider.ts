@@ -22,6 +22,7 @@ export class TrackProvider {
     /**
      * Load track data by specific id
      * 
+     * @async
      * @param id Track id
      * @returns Track object
      */
@@ -39,6 +40,7 @@ export class TrackProvider {
     /**
      * Store a new track and return updated track object with newly assigned id
      * 
+     * @async
      * @param playlist Track object
      * @returns Updated track object
      */
@@ -64,6 +66,7 @@ export class TrackProvider {
     /**
      * Update an existing track
      * 
+     * @async
      * @param playlist Track object
      * @returns Track object
      */

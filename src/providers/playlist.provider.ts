@@ -23,6 +23,7 @@ export class PlaylistProvider {
     /**
      * Load playlist data by specific id
      * 
+     * @async
      * @param id Playlist id
      * @returns Playlist object
      */
@@ -40,6 +41,7 @@ export class PlaylistProvider {
     /**
      * Store a new playlist and return updated playlist object with newly assigned id
      * 
+     * @async
      * @param playlist Playlist object
      * @returns Updated playlist object
      */
@@ -60,6 +62,7 @@ export class PlaylistProvider {
     /**
      * Update an existing playlist
      * 
+     * @async
      * @param playlist Playlist object
      * @returns Playlist object
      */
@@ -79,6 +82,7 @@ export class PlaylistProvider {
     /**
      * Delete an existing playlist
      * 
+     * @async
      * @param id Playlist id
      */
     public async deletePlaylist(id: number) {
@@ -113,6 +117,7 @@ export class PlaylistProvider {
     /**
      * Load playlist track data by specific playlist and track id
      * 
+     * @async
      * @param playlistId Playlist id
      * @param trackId Track id
      * @returns PlaylistTrack object
@@ -135,6 +140,7 @@ export class PlaylistProvider {
     /**
      * Load all playlist tracks by specific playlist id
      * 
+     * @async
      * @param playlistId Playlist id
      * @returns List of playlistTrack objects
      */
@@ -153,6 +159,7 @@ export class PlaylistProvider {
      * Load list of the least played playlist tracks by specific playlist id.
      * For further refining requires a number of tracks to return and limiting date of last play.
      * 
+     * @async
      * @param playlistId Playlist id
      * @param limit Number of tracks to return
      * @param lastPlayLimit Maximum date to which tracks are looked up
@@ -175,6 +182,7 @@ export class PlaylistProvider {
     /**
      * Store a new playlist track and return playlistTrack object
      * 
+     * @async
      * @param playlistTrack PlaylistTrack object
      * @returns PlaylistTrack object
      */
@@ -194,6 +202,7 @@ export class PlaylistProvider {
     /**
      * Update an existing playlist track
      * 
+     * @async
      * @param playlistTrack PlaylistTrack object
      * @returns PlaylistTrack object
      */
@@ -215,6 +224,7 @@ export class PlaylistProvider {
     /**
      * Delete an existing playlist track
      * 
+     * @async
      * @param playlistId Playlist id
      * @param trackId Track id
      */
@@ -232,6 +242,7 @@ export class PlaylistProvider {
     /**
      * Delete all playlist tracks by specific playlist id
      * 
+     * @async
      * @param playlistId Playlist id
      */
     public async deletePlaylistTracksByPlaylistId(playlistId: number) {
@@ -247,6 +258,7 @@ export class PlaylistProvider {
     /**
      * Delete all playlist tracks by specific track id
      * 
+     * @async
      * @param trackId Track id
      */
     public async deletePlaylistTracksByTrackId(trackId: number) {
@@ -262,6 +274,7 @@ export class PlaylistProvider {
     /**
      * Update playlist track's last play date and increment play count
      * 
+     * @async
      * @param playlistId Playlist id
      * @param trackId Track id
      * @param lastPlay Last play date

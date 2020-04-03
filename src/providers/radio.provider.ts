@@ -23,6 +23,7 @@ export class RadioProvider {
     /**
      * Load radio data by specific id
      * 
+     * @async
      * @param id Radio id
      * @returns Radio object
      */
@@ -40,6 +41,7 @@ export class RadioProvider {
     /**
      * Load a list of radios
      * 
+     * @async
      * @returns List of radio objects
      */
     public async getAllRadios(): Promise<Radio[]> {
@@ -54,6 +56,7 @@ export class RadioProvider {
     /**
      * Store a new radio and return updated radio object with newly assigned id
      * 
+     * @async
      * @param playlist Radio object
      * @returns Updated radio object
      */
@@ -72,6 +75,7 @@ export class RadioProvider {
     /**
      * Update an existing radio
      * 
+     * @async
      * @param playlist Radio object
      * @returns Radio object
      */
@@ -88,6 +92,7 @@ export class RadioProvider {
     /**
      * Delete an existing radio
      * 
+     * @async
      * @param id Radio id
      */    
     public async deleteRadio(id: number) {
@@ -103,6 +108,7 @@ export class RadioProvider {
     /**
      * Load all radio tracks by specific radio id
      * 
+     * @async
      * @param radioId Radio id
      * @returns List of radioTrack objects
      */
@@ -121,6 +127,7 @@ export class RadioProvider {
     /**
      * Store a new radio track and return radioTrack object
      * 
+     * @async
      * @param radioTrack RadioTrack object
      * @returns RadioTrack object
      */
@@ -141,6 +148,7 @@ export class RadioProvider {
     /**
      * Delete an existing radio track
      * 
+     * @async
      * @param radioId Radio id
      * @param trackId Track id
      */
