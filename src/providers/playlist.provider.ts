@@ -90,6 +90,27 @@ export class PlaylistProvider {
     }
 
     /**
+     * Get cummulative playlist duration in ms
+     * 
+     * @async
+     * @param id Playlist id
+     * @returns Cummulative playlist duration in ms
+     */
+    public async getPlaylistDuration(id: number): Promise<number> {
+        const dbc = await this.db.getConnection();
+        const result = await dbc
+            .select(dbc.raw('SUM(`duration`) as duration'))
+            .from('chill_playlist_tracks')
+            .join('chill_tracks', 'track_id', 'id')
+            .where({
+                playlist_id: id
+            })
+            .first();
+            
+        return Number(result.duration);
+    }
+
+    /**
      * Load playlist track data by specific playlist and track id
      * 
      * @param playlistId Playlist id

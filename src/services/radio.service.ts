@@ -199,11 +199,15 @@ export class RadioService {
             let lastTrack = radio.getLastTrack();
             let lastTime = (lastTrack && lastTrack.endTime) ? lastTrack.endTime : new Date();
 
+            // Check the maximum playlist duration and lower the shuffleTimeout limit if necessary
+            const playlistDuration = await getProviders().playlist.getPlaylistDuration(radio.playlistId);
+            let minShuffleTimeout = (playlistDuration < this.config.minShuffleTimeout) ? playlistDuration : this.config.minShuffleTimeout;
+
             // Get an array of new tracks for current radio
             const newTracks = await getProviders().playlist.getLeastPlayedPlaylistTracks(
                 radio.playlistId,
                 this.config.playlistLength - radio.tracks.length,
-                new Date(lastTime.getTime() - this.config.minShuffleTimeout)
+                new Date(lastTime.getTime() - minShuffleTimeout)
             );
 
             // Iterate over new tracks and add them to the radio playlist
