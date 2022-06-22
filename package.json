@@ -20,7 +20,7 @@
   "author": "Jozef Zsapka",
   "license": "ISC",
   "dependencies": {
-    "async": "^3.2.0",
+    "async": "^3.2.2",
     "cross-env": "^7.0.2",
     "dotenv": "^8.2.0",
     "env-prompt": "^1.0.7",
